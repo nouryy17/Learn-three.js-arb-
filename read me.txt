@@ -1,0 +1,6 @@
+This repository is a practical application for educational video for a channel:: freeCodeCamp
+
+link:: https://www.youtube.com/watch?v=UMqNHi1GDAE
+
+
+Note: I explained all the codes and added them in Arabic language
