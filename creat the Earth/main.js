@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { OrbitControls } from "three/examples/jsm/Addons.js";
+import  getStarfield  from './node_modules/three/src/getStarfield.js';
 // استدعاء OrbitControls من اجل تحكم و تحريك الكاميرا
 
 
@@ -34,12 +35,14 @@ const  controls=new OrbitControls(camera,renderer.domElement)
 controls.enableDamping=true
 controls.dampingFactor=0.03
 // تحريك الكرة اصبح افضل
-const geo=new THREE.IcosahedronGeometry(1,2)
+const earthGrup=new THREE.Group()
+earthGrup.rotation.z= 23.4 * Math.PI / 180  //زاوية دوران الارض 
+let loder=new THREE.TextureLoader() //يستخدمان لتغليف الكرة بالخريطة
+const geo=new THREE.IcosahedronGeometry(1,14)
 // هو مثلث متساوي الاضلاع يتكون من 20 وجه
 // الارقام هي الحجم و تفاصيل الوجه
 const mat =new THREE.MeshStandardMaterial({
-    color: "#e9997e",
-    flatShading:true  //هاذس الخاصية تبين و تظهر  المثلثات المشكلة للهندسة 
+    map: loder.load("00_earthmap1k.jpg") //يستخدمان لتغليف الكرة بالخريطة
 })
 // لون يكتب بطريقة الاعداد السادس عشر من 000000 الى ffffff
 // كل شكل هندسي في three.Js مكون من هندسة و مادة 
@@ -47,28 +50,19 @@ const mat =new THREE.MeshStandardMaterial({
 // اما المادة فهي عبارة عن اللون و الاشياء المماثله
 // الفرق بين MeshStandardMaterial و  MeshBasicMaterial
 // انو وحدة تظهر بالضوء فقط بينما الاخرة تظهر حتى بدون ضوء
-const mash=new THREE.Mesh(geo,mat)
+const mash = new THREE.Mesh(geo,mat)
 //  اربط بين الهندسة و المادة = شكل
-scene.add(mash)
-// هاذي الخطوط الموجودة بين المثلثات
-const wireMat =new THREE.MeshStandardMaterial({
-    color: "6e69ff",
-    wireframe:true,
-})
-const wireMash=new THREE.Mesh(geo,wireMat)
-wireMash.scale.setScalar(1.001)
-// اصبح اكثر بروز
-mash.add(wireMash)
-// هنا اجعل  wireMash ابن ل  mash
-
-
+earthGrup.add(mash)
+scene.add(earthGrup)
 // اضيف الشكل الى المشهد
+const sters=getStarfield(numStars:2000)
+scene.add(sters)
 // انشاء ضوء
-const ligth =new THREE.HemisphereLight(0x0099ff,0xdf445d5)
+const ligth =new THREE.HemisphereLight(0xffc5ff)
 scene.add(ligth)
 function animtion(t = 0) {
     requestAnimationFrame(animtion)
-    // mash.rotation.y=t * 0.0001
+    mash.rotation.y=t * 0.0001
     // mash.rotateX=t * 0.0001
     // هنا لتحريك الكرة
     renderer.render(scene,camera)

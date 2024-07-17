@@ -1,0 +1,13 @@
+import * as THREE from 'three';
+console.log(THREE)
+// عرض الشاشة
+const w=window.innerWidth
+// طول الشاشة
+const h=window.innerHeight
+//  renderer==العارض
+const renderer=new THREE.WebGLRenderer({antialias:true})
+renderer.setSize(w,h)
+//  نمرر خاصية الذي سيجعلها تبدو افضل ولكن هناك طريقة اخرى لانشاء العارض 
+// const renderer = new THREE.WebGLRenderer()
+// renderer.setSize(innerWidth, innerHeight)
+document.body.appendChild(renderer.domElement)
