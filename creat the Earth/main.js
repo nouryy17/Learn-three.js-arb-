@@ -1,8 +1,9 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/Addons.js";
-
-
 import getStarfield from "./node_modules/three/src/getStarfield.js";
+import { getFresnelMat } from "./node_modules/three/src/getFresnelMat.js";
+
+
 
 const w = window.innerWidth;
 const h = window.innerHeight;
@@ -12,6 +13,7 @@ camera.position.z = 5;
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(w, h);
 document.body.appendChild(renderer.domElement);
+// THREE.ColorManagement.enabled = true;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 
@@ -23,11 +25,15 @@ const detail = 12;
 const loader = new THREE.TextureLoader();
 const geometry = new THREE.IcosahedronGeometry(1, detail);
 const material = new THREE.MeshPhongMaterial({
-  map: loader.load("./img/00_earthmap1k.jpg"),
+  map: loader.load("./img/00_earthspec1k.jpg"),
+  specularMap: loader.load("./img/02_earthspec1k.jpg"),
+  bumpMap: loader.load("./img/01_earthbump1k.jpg"),
+  bumpScale: 0.04,
 });
+// material.map.colorSpace = THREE.SRGBColorSpace;
 const earthMesh = new THREE.Mesh(geometry, material);
 earthGroup.add(earthMesh);
-
+// اضافة الجانب المظلم من الكرة الارضية
 const lightsMat = new THREE.MeshBasicMaterial({
   map: loader.load("./img/03_earthlights1k.jpg"),
   blending: THREE.AdditiveBlending,
@@ -35,9 +41,27 @@ const lightsMat = new THREE.MeshBasicMaterial({
 const lightsMesh = new THREE.Mesh(geometry, lightsMat);
 earthGroup.add(lightsMesh);
 
+const cloudsMat = new THREE.MeshStandardMaterial({
+  map: loader.load("./img/04_earthcloudmap.jpg"),
+  transparent: true,
+  opacity: 0.8,
+  blending: THREE.AdditiveBlending,
+  alphaMap: loader.load('./img/05_earthcloudmaptrans.jpg'),
+  // alphaTest: 0.3,
+});
+// اضافة السحب للكرة الارضية
+const cloudsMesh = new THREE.Mesh(geometry, cloudsMat);
+cloudsMesh.scale.setScalar(1.003);
+earthGroup.add(cloudsMesh);
+
+const fresnelMat = getFresnelMat();
+const glowMesh = new THREE.Mesh(geometry, fresnelMat);
+glowMesh.scale.setScalar(1.01);
+earthGroup.add(glowMesh);
+// اضافة النجوم 
 const stars = getStarfield({numStars: 2000});
 scene.add(stars);
-
+// اضافة ضوء الشمس
 const sunLight = new THREE.DirectionalLight(0xffffff, 2.0);
 sunLight.position.set(-2, 0.5, 1.5);
 scene.add(sunLight);
@@ -47,8 +71,17 @@ function animate() {
 
   earthMesh.rotation.y += 0.002;
   lightsMesh.rotation.y += 0.002;
+  cloudsMesh.rotation.y += 0.0023;
+  glowMesh.rotation.y += 0.002;
+  stars.rotation.y -= 0.0002;
   renderer.render(scene, camera);
 }
 
 animate();
-
+// دالة  لضبط الطول و العرض للصفحة و الكاميرا
+function handleWindowResize () {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+}
+window.addEventListener('resize', handleWindowResize, false);
