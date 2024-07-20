@@ -2,7 +2,6 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/Addons.js";
 // تجعلك قادر على تحريك الكائن الممر فيها
 import getStarfield from "./node_modules/three/src/getStarfield.js";
-// مسؤول على النجوم لكن لا اعرف لماذا لم تعمل
 import { getFresnelMat } from "./node_modules/three/src/getFresnelMat.js";
 // مسؤول على الشعاع الازرق المحيط بالكرة
 const w = window.innerWidth;
@@ -89,3 +88,4 @@ function handleWindowResize () {
   renderer.setSize(window.innerWidth, window.innerHeight);
 }
 window.addEventListener('resize', handleWindowResize, false);
+
